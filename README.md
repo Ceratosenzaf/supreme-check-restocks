@@ -6,7 +6,7 @@ It will notify in case of restocks, new colors or new products added.
 (Right now it notifies the changes in the comand line, but you can edit it as you prefer)
 
 Necessary:
-  * [Python](https://www.python.org/)
+  * [Python 3](https://www.python.org/)
   * [Scrapy](https://scrapy.org/)
   * [Twisted](https://pypi.org/project/Twisted/) (only necessary if you want the script to continue running)
 
