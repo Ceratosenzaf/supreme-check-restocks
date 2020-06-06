@@ -86,7 +86,8 @@ class CheckAvailabilitySpider(CrawlSpider):
                 if sizes != 'all sold out' and sizes != 'monosize':  # new item / color
                     for s in sizes:
                         logging.info(f'NEW ITEM ADDED: {name} color {color} in size {s} at {price}. Link: {url}')
-
+                elif sizes == 'monosize':
+                    logging.info(f'NEW ITEM ADDED: {name} color {color} at {price}. Link: {url}')
 
 
 
