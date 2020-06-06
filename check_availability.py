@@ -55,7 +55,6 @@ class CheckAvailabilitySpider(CrawlSpider):
                     "available sizes": sizes,
                 }
         except:
-            
             self.data[name] = {}
             self.data[name][color] = {
                 "url": url,
@@ -63,7 +62,21 @@ class CheckAvailabilitySpider(CrawlSpider):
                 "available sizes": sizes,
             }
 
-
+        # look for restocks or new items
+        try:
+            old_sizes = self.old_data.get(name).get(color).get("available sizes")
+            new_sizes = self.data.get(name).get(color).get("available sizes")
+            if new_sizes != old_sizes:
+                if sizes == 'monosize':
+                    logging.info(f'RESTOCK: {name} color {color} just restocked. Link: {url}')
+                else:
+                    different_sizes = { k : new_sizes[k] for k in set(new_sizes) - set(old_sizes) }.keys()
+                    for size in different_sizes:
+                        logging.info(f'RESTOCK: {name} color {color} just restocked in size {size}. Link: {url}')
+        except:
+            logging.info(f'NEW ITEM ADDED: {name} color {color} in size {size}. Link: {url}')
+        
+    
     def closed(self, spider):
         with open('items.json', 'w') as f:
             f.write(str(self.data).replace('\'', '\"'))
@@ -92,7 +105,6 @@ if __name__ == '__main__':
     # all the spider settings go here
     process = CrawlerProcess({
             'USER_AGENT': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)',
-            'FEEDS': {'items.json': {'format': 'json'}},
             })
 
     crawl(None, CheckAvailabilitySpider)
