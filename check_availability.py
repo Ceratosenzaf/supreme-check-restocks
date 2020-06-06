@@ -99,11 +99,11 @@ def sleep(self, *args, seconds):
 def crawl(result, spider):
     d = process.crawl(spider)
 
-    # uncomment below to add delay between each time the spider runs (change seconds to increase or reduce delay between operations)
+    # if uncommented will add delay between each time the spider runs (change seconds to increase or reduce delay between operations)
     # d.addCallback(lambda results: print('waiting 10 seconds before restart...'))
     # d.addCallback(sleep, seconds=10)
 
-    # uncommenting will loop forever and live monitor the availability
+    # if uncommented will loop forever and live monitor the availability
     d.addCallback(crawl, spider)
     return d
 
