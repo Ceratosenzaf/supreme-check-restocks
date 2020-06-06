@@ -5,6 +5,8 @@ This program will live monitor the [supreme store](https://www.supremenewyork.co
 It will notify in case of restocks, new colors or new products added.    
 (Right now it notifies the changes in the comand line, but you can edit it as you prefer)
 
+To use it just download the project and run the [python file](check_availability.py)
+
 Necessary:
   * [Python 3](https://www.python.org/)
   * [Scrapy](https://scrapy.org/)
