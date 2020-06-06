@@ -72,18 +72,20 @@ class CheckAvailabilitySpider(CrawlSpider):
 
         # look for restocks or new items
         if self.old_data != {}:
-            try:
+            try: # restocked size
                 old_sizes = self.old_data.get(name).get(color).get("available sizes")
                 new_sizes = self.data.get(name).get(color).get("available sizes")
-                if new_sizes != old_sizes:
+                if new_sizes != old_sizes and sizes == new_sizes != "all sold out":
                     if sizes == 'monosize':
                         logging.info(f'RESTOCK: {name} color {color} just restocked at {price}. Link: {url}')
                     else:
                         different_sizes = { k : new_sizes[k] for k in set(new_sizes) - set(old_sizes) }.keys()
-                        for size in different_sizes:
-                            logging.info(f'RESTOCK: {name} color {color} just restocked in size {size} at {price}. Link: {url}')
-            except:
-                logging.info(f'NEW ITEM ADDED: {name} color {color} in size {size} at {price}. Link: {url}')
+                        for s in different_sizes:
+                            logging.info(f'RESTOCK: {name} color {color} just restocked in size {s} at {price}. Link: {url}')
+            except: # new item / color
+                if sizes != 'all sold out' and sizes != 'monosize':
+                    for s in sizes:
+                        logging.info(f'NEW ITEM ADDED: {name} color {color} in size {s} at {price}. Link: {url}')
 
 
 
