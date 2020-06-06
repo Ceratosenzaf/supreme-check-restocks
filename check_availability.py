@@ -31,8 +31,8 @@ class CheckAvailabilitySpider(CrawlSpider):
 
     # parse and collect new data
     def parse_item(self, response):
-        name = response.xpath('//*[@id="details"]/h1/text()').get().replace('"', 'inch')
-        color = response.xpath('//*[@id="details"]/p[1]/text()').get().replace('"', 'inch')
+        name = response.xpath('//*[@id="details"]/h1/text()').get().replace('"', ' inches')
+        color = response.xpath('//*[@id="details"]/p[1]/text()').get().replace('"', ' inches')
         url = response.url
         image = response.urljoin(response.xpath('//*[@id="img-main"]/@src').get())
 
@@ -47,7 +47,6 @@ class CheckAvailabilitySpider(CrawlSpider):
             if sizes == {}:
                 sizes = 'monosize'
                 
-
         # create new dataset
         try:
             self.data[name][color] = {
@@ -63,16 +62,7 @@ class CheckAvailabilitySpider(CrawlSpider):
                 "image": image,
                 "available sizes": sizes,
             }
-        
-        # yield{
-        #     name: {
-        #         color: {
-        #             "url": url,
-        #             "image": image,
-        #             "available sizes": sizes,
-        #         }
-        #     }
-        # }
+
 
     def closed(self, spider):
         with open('items.json', 'w') as f:
