@@ -19,7 +19,7 @@ class CheckAvailabilitySpider(CrawlSpider):
             restrict_xpaths='//*[@id="container"]/article/div/a'), callback='parse_item', follow=True),
     )
 
-    # get old data from file
+    # once opened spider read old data from file
     def __init__(self, *a, **kw):
         super().__init__(*a, **kw)
         self.data = {}
@@ -28,6 +28,11 @@ class CheckAvailabilitySpider(CrawlSpider):
                 self.old_data = json.load(f)
         except:
             self.old_data = {}
+
+    # once closed spider write new data to file
+    def closed(self, spider):
+        with open('items.json', 'w') as f:
+            f.write(str(self.data).replace('\'', '\"'))
 
     # parse and collect new data
     def parse_item(self, response):
@@ -63,27 +68,24 @@ class CheckAvailabilitySpider(CrawlSpider):
             }
 
         # look for restocks or new items
-        try:
-            old_sizes = self.old_data.get(name).get(color).get("available sizes")
-            new_sizes = self.data.get(name).get(color).get("available sizes")
-            if new_sizes != old_sizes:
-                if sizes == 'monosize':
-                    logging.info(f'RESTOCK: {name} color {color} just restocked. Link: {url}')
-                else:
-                    different_sizes = { k : new_sizes[k] for k in set(new_sizes) - set(old_sizes) }.keys()
-                    for size in different_sizes:
-                        logging.info(f'RESTOCK: {name} color {color} just restocked in size {size}. Link: {url}')
-        except:
-            logging.info(f'NEW ITEM ADDED: {name} color {color} in size {size}. Link: {url}')
-        
-    
-    def closed(self, spider):
-        with open('items.json', 'w') as f:
-            f.write(str(self.data).replace('\'', '\"'))
+        if self.old_data != {}:
+            try:
+                old_sizes = self.old_data.get(name).get(color).get("available sizes")
+                new_sizes = self.data.get(name).get(color).get("available sizes")
+                if new_sizes != old_sizes:
+                    if sizes == 'monosize':
+                        logging.info(f'RESTOCK: {name} color {color} just restocked. Link: {url}')
+                    else:
+                        different_sizes = { k : new_sizes[k] for k in set(new_sizes) - set(old_sizes) }.keys()
+                        for size in different_sizes:
+                            logging.info(f'RESTOCK: {name} color {color} just restocked in size {size}. Link: {url}')
+            except:
+                logging.info(f'NEW ITEM ADDED: {name} color {color} in size {size}. Link: {url}')
 
 
 
-# spider execution here below
+
+# ***** SPIDER EXECUTION *****
 
 def sleep(self, *args, seconds):
     return deferLater(reactor, seconds, lambda: None)
@@ -92,13 +94,13 @@ def sleep(self, *args, seconds):
 def crawl(result, spider):
     d = process.crawl(spider)
 
-    # uncomment below to add delay between each time the spider runs (cange seconds to increase or reduce delay)
-    # d.addCallback(lambda results: print('waiting 30 seconds before restart...'))
-    # d.addCallback(sleep, seconds=30)
+    # uncomment below to add delay between each time the spider runs (change seconds to increase or reduce delay between operations)
+    # d.addCallback(lambda results: print('waiting 10 seconds before restart...'))
+    # d.addCallback(sleep, seconds=10)
 
-    # uncomment below to loop forever and live monitor the availability
-    # d.addCallback(crawl, spider)
-    # return d
+    # uncommenting will loop forever and live monitor the availability
+    d.addCallback(crawl, spider)
+    return d
 
 
 if __name__ == '__main__':
