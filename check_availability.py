@@ -40,6 +40,7 @@ class CheckAvailabilitySpider(CrawlSpider):
         color = response.xpath('//*[@id="details"]/p[1]/text()').get().replace('"', ' inches')
         url = response.url
         image = response.urljoin(response.xpath('//*[@id="img-main"]/@src').get())
+        price = response.xpath('//span[@itemprop = "price"]/text()').get()
 
         if response.xpath('//*[@id="add-remove-buttons"]/b[@class="button sold-out"]'):
            sizes = "all sold out"
@@ -57,6 +58,7 @@ class CheckAvailabilitySpider(CrawlSpider):
             self.data[name][color] = {
                     "url": url,
                     "image": image,
+                    "price": price,
                     "available sizes": sizes,
                 }
         except:
@@ -64,6 +66,7 @@ class CheckAvailabilitySpider(CrawlSpider):
             self.data[name][color] = {
                 "url": url,
                 "image": image,
+                "price": price,
                 "available sizes": sizes,
             }
 
@@ -74,13 +77,13 @@ class CheckAvailabilitySpider(CrawlSpider):
                 new_sizes = self.data.get(name).get(color).get("available sizes")
                 if new_sizes != old_sizes:
                     if sizes == 'monosize':
-                        logging.info(f'RESTOCK: {name} color {color} just restocked. Link: {url}')
+                        logging.info(f'RESTOCK: {name} color {color} just restocked at {price}. Link: {url}')
                     else:
                         different_sizes = { k : new_sizes[k] for k in set(new_sizes) - set(old_sizes) }.keys()
                         for size in different_sizes:
-                            logging.info(f'RESTOCK: {name} color {color} just restocked in size {size}. Link: {url}')
+                            logging.info(f'RESTOCK: {name} color {color} just restocked in size {size} at {price}. Link: {url}')
             except:
-                logging.info(f'NEW ITEM ADDED: {name} color {color} in size {size}. Link: {url}')
+                logging.info(f'NEW ITEM ADDED: {name} color {color} in size {size} at {price}. Link: {url}')
 
 
 
@@ -99,8 +102,8 @@ def crawl(result, spider):
     # d.addCallback(sleep, seconds=10)
 
     # uncommenting will loop forever and live monitor the availability
-    d.addCallback(crawl, spider)
-    return d
+    # d.addCallback(crawl, spider)
+    # return d
 
 
 if __name__ == '__main__':
