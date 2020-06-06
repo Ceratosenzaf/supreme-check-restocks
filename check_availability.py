@@ -104,8 +104,8 @@ def crawl(result, spider):
     # d.addCallback(sleep, seconds=10)
 
     # uncommenting will loop forever and live monitor the availability
-    # d.addCallback(crawl, spider)
-    # return d
+    d.addCallback(crawl, spider)
+    return d
 
 
 if __name__ == '__main__':
