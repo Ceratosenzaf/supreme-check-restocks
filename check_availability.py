@@ -88,7 +88,7 @@ class CheckAvailabilitySpider(CrawlSpider):
 
 
 
-# ***** SPIDER EXECUTION *****
+# ***** SPIDER EXECUTION HERE *****
 
 def sleep(self, *args, seconds):
     return deferLater(reactor, seconds, lambda: None)
